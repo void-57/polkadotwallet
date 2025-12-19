@@ -39,6 +39,15 @@
     --body-bg: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
 }
 
+/* Polkadot Logo - Invert color in light mode */
+.polkadot-logo {
+    filter: brightness(0) invert(1); /* White in dark mode */
+}
+
+[data-theme="light"] .polkadot-logo {
+    filter: brightness(0) invert(0); /* Black in light mode */
+}
+
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     background: var(--body-bg);
