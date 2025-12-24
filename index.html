@@ -1308,6 +1308,8 @@
           console.error("Error searching address:", error);
           showNotification("❌ Error: " + error.message, "error");
           document.getElementById("tx-results").style.display = "none";
+          document.getElementById("tx-history").innerHTML = "";
+          document.getElementById("transactionFilterSection").style.display = "none";
         } finally {
           const searchBtn = document.getElementById("searchBtn");
           searchBtn.disabled = false;
@@ -1338,11 +1340,13 @@
           url.searchParams.delete("address");
           window.history.pushState({}, "", url);
 
-          // Hide address results, show tx hash results
+          // Hide address results and recent searches, show tx hash results
           document.getElementById("tx-results").style.display = "none";
           document.getElementById("transactionFilterSection").style.display =
             "none";
           document.getElementById("tx-history").style.display = "none";
+          document.getElementById("tx-pagination").style.display = "none";
+          document.getElementById("recent-searches").style.display = "none";
           document.getElementById("txhash-results").style.display = "block";
 
           // Populate transaction details
@@ -1924,16 +1928,23 @@
       function switchSearchType(type) {
         currentSearchType = type;
 
-        // Update new radio button selectors
+        // Update new radio button selectors (labels)
         const addressType = document.getElementById("addressSearchType");
         const hashType = document.getElementById("hashSearchType");
+        
+        // Update the actual radio inputs
+        const addressRadio = document.querySelector('input[name="searchType"][value="address"]');
+        const hashRadio = document.querySelector('input[name="searchType"][value="hash"]');
+        
         if (addressType && hashType) {
           if (type === "address") {
             addressType.classList.add("active");
             hashType.classList.remove("active");
+            if (addressRadio) addressRadio.checked = true;
           } else {
             addressType.classList.remove("active");
             hashType.classList.add("active");
+            if (hashRadio) hashRadio.checked = true;
           }
         }
 
@@ -2053,6 +2064,17 @@
             sidebarOverlay.classList.remove("active");
           });
         }
+      }
+
+      function initializeSearchTypeSelectors() {
+        // Set up event listeners for search type radio buttons
+        const searchTypeRadios = document.querySelectorAll('input[name="searchType"]');
+        searchTypeRadios.forEach((radio) => {
+          radio.addEventListener("change", (e) => {
+            const selectedType = e.target.value === "address" ? "address" : "txhash";
+            switchSearchType(selectedType);
+          });
+        });
       }
 
       function switchTabByPage(page) {
@@ -2374,6 +2396,9 @@
         } else if (address) {
           // Switch to transactions tab
           switchTabByPage("transactions");
+
+          // Switch to address search type
+          switchSearchType("address");
 
           // Load the address
           document.getElementById("tx-search-input").value = address;
